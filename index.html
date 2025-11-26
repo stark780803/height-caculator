@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>少翔機電 - 穿樑高層計算機 V16.0</title>
+    <title>少翔機電 - 穿樑高層計算機 V17.4</title>
     <style>
-        /* --- 基礎設定 --- */
+        /* --- 全局設定 --- */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             background-color: #f0f4f8; 
@@ -22,9 +22,9 @@
             border-radius: 16px; 
             box-shadow: 0 4px 25px rgba(0,0,0,0.08); 
             width: 100%; 
-            max-width: 600px; /* 手機預設寬度 */
+            max-width: 600px; 
             box-sizing: border-box;
-            transition: max-width 0.3s ease; /* 讓寬度變化有動畫 */
+            transition: max-width 0.3s ease; 
         }
         
         h2 { 
@@ -36,21 +36,10 @@
             font-size: 1.5rem; 
         }
 
-        /* --- 版面佈局系統 (Layout System) --- */
-        .layout-wrapper {
-            display: block; /* 手機預設單欄 */
-        }
+        /* --- Layout System --- */
+        .layout-wrapper { display: block; }
 
-        .left-panel-wrapper {
-            /* 操作區 */
-        }
-
-        .right-panel-wrapper {
-            /* 顯示區 */
-        }
-
-        /* --- 元件樣式 --- */
-        /* 模式切換 */
+        /* --- Components --- */
         .mode-switch {
             display: flex;
             background: #eceff1;
@@ -74,15 +63,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* 輸入網格 */
-        .input-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-        }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         
-        /* 分區標題 */
         .group-header {
             grid-column: span 2;
             font-size: 0.95rem;
@@ -106,14 +88,12 @@
         input:focus, select:focus { border-color: #00897b; outline: none; }
         .drop-input { border-color: #ffb74d; background: #fff8e1; }
 
-        /* 升降板組合輸入 */
         .slab-adj-group { display: flex; gap: 5px; }
         .slab-adj-group select { width: 45%; background: #fff8e1; border-color: #ffb74d; }
         .slab-adj-group input { width: 55%; border-color: #ffb74d; background: #fff8e1;}
 
         .hidden { display: none !important; }
 
-        /* 計算按鈕 */
         .main-btn { 
             width: 100%; padding: 15px; background-color: #00897b; color: white; border: none; 
             border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; 
@@ -122,10 +102,7 @@
         }
         .main-btn:active { transform: scale(0.98); }
 
-        /* 微調控制 (放在左側) */
-        .adjust-panel { 
-            display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #ffe0b2;
-        }
+        .adjust-panel { display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #ffe0b2; }
         .adjust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .adj-col { text-align: center; }
         .adj-col h4 { margin: 0 0 8px 0; font-size: 1rem; color: #444; }
@@ -140,16 +117,10 @@
         .btn-b.up { background: #ffe0b2; color: #e65100; }
         .btn-b.down { background: #ffcc80; color: #e65100; }
 
-        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; margin-top: 5px;}
+        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; margin-top: 5px; min-height: 1.2em;}
 
-        /* 結果表格 (放在右側) */
         .result-panel { 
-            background: #e0f2f1; 
-            border-radius: 10px; 
-            margin-top: 20px; /* 手機版間距 */
-            display: none; 
-            overflow: hidden; 
-            border: 1px solid #b2dfdb; 
+            background: #e0f2f1; border-radius: 10px; margin-top: 20px; display: none; overflow: hidden; border: 1px solid #b2dfdb; 
         }
         
         .compare-table { width: 100%; border-collapse: collapse; }
@@ -161,34 +132,46 @@
         
         .status-box { padding: 12px; text-align: center; font-weight: bold; font-size: 1rem; margin-top: 0; }
         
-        /* 圖示區 (放在右側) */
+        /* 圖示區 */
         .diagram-box { 
-            margin-top: 20px; 
-            height: 400px; 
-            position: relative; 
-            border: 2px solid #ddd; 
-            background: #fff; 
-            display: none; 
-            overflow: hidden; 
-            border-radius: 10px; 
-            padding-left: 0; 
+            margin-top: 20px; height: 420px; position: relative; 
+            border: 2px solid #ddd; background: #fff; display: none; overflow: hidden; border-radius: 10px; 
+            padding-left: 0; margin-bottom: 20px;
         }
         
-        /* 繪圖元件樣式 */
         .beam-col { 
             position: absolute; right: 0; top: 30px; width: 50%; display: flex; flex-direction: column; 
             border-left: 3px solid #333; border-bottom: 3px solid #333; border-top: 2px solid #999;
             background: #eceff1; box-sizing: border-box; 
         }
-        .zone { display: flex; align-items: center; justify-content: center; font-size: 11px; width: 100%; position: relative; }
-        .zone-slab { background: #cfd8dc; color: #455a64; font-weight: bold; border-bottom: 2px solid #455a64; z-index: 2; box-sizing: border-box;}
-        .zone-danger { background: rgba(198, 40, 40, 0.1); box-sizing: border-box;}
-        .zone-safe { background: rgba(67, 160, 71, 0.2); color: #2e7d32; font-weight: bold; border-top: 2px dashed #43a047; border-bottom: 2px dashed #43a047; z-index: 1; box-sizing: border-box;}
+        
+        .abs-zone { position: absolute; left: 0; width: 100%; box-sizing: border-box; }
+        .zone-slab { background: #cfd8dc; color: #455a64; font-weight: bold; border-bottom: 2px solid #455a64; z-index: 2; display:flex; align-items:center; justify-content:center; font-size:11px;}
+        .zone-danger { background: rgba(198, 40, 40, 0.1); z-index: 1; }
+        .zone-safe { 
+            background: rgba(67, 160, 71, 0.2); 
+            color: #2e7d32; font-weight: bold; 
+            z-index: 1; 
+            display:flex; align-items:center; justify-content:center; font-size:11px;
+        }
 
-        .sleeve-a { position: absolute; background: rgba(33, 150, 243, 0.15); border: 2px dashed #1976d2; border-radius: 50%; z-index: 5; left: 50%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
-        .pipe-a { position: absolute; background: rgba(33, 150, 243, 0.8); border: 1px solid #0d47a1; border-radius: 50%; z-index: 10; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-        .sleeve-b { position: absolute; background: rgba(255, 152, 0, 0.15); border: 2px dashed #f57c00; border-radius: 50%; z-index: 6; left: 65%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
-        .pipe-b { position: absolute; background: rgba(255, 152, 0, 0.8); border: 1px solid #e65100; border-radius: 50%; z-index: 11; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .limit-line {
+            position: absolute; left: 0; width: 100%; height: 2px;
+            background-image: linear-gradient(to right, #43a047 50%, transparent 50%);
+            background-size: 10px 100%; 
+            background-repeat: repeat-x;
+            z-index: 3; 
+        }
+
+        /* 管子樣式 */
+        .sleeve-a { position: absolute; background: rgba(33, 150, 243, 0.15); border: 2px dashed #1976d2; border-radius: 50%; z-index: 10; left: 50%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
+        .pipe-a { position: absolute; background: rgba(33, 150, 243, 0.8); border: 1px solid #0d47a1; border-radius: 50%; z-index: 15; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .sleeve-b { position: absolute; background: rgba(255, 152, 0, 0.15); border: 2px dashed #f57c00; border-radius: 50%; z-index: 11; left: 65%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
+        .pipe-b { position: absolute; background: rgba(255, 152, 0, 0.8); border: 1px solid #e65100; border-radius: 50%; z-index: 16; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+        .center-dot {
+            position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 20;
+        }
 
         .topping-visual { position: absolute; left: 130px; right: 50%; background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 5px, #e0e0e0 5px, #e0e0e0 10px); z-index: 1; border-bottom: 1px dashed #999; text-align: center; font-size: 10px; color: #666; display: flex; align-items: center; justify-content: center;}
         .slab-visual { position: absolute; left: 130px; right: 50%; background: #90a4ae; border-bottom: 1px solid #78909c; z-index: 2; color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center;}
@@ -201,31 +184,20 @@
         .dim-text-label { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.95); padding: 1px 4px; font-size: 11px; font-weight: bold; color: #333; border: 1px solid #ccc; border-radius: 3px; white-space: nowrap; z-index: 20;}
         .fl-top-label { position: absolute; top: 5px; left: 132px; font-size: 12px; color: #333; font-weight: bold; z-index: 20; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #ddd; }
 
+        .bs-target-dot { position: absolute; width: 6px; height: 6px; background: #d84315; border-radius: 50%; left: -2px; bottom: -3px; z-index: 30; }
+
         .footer { text-align: center; margin-top: 20px; color: #90a4ae; font-size: 0.85rem; padding-bottom: 5px; letter-spacing: 0.5px; width: 100%; grid-column: span 2;}
 
-        /* --- 💻 電腦版 RWD 關鍵魔法 --- */
+        /* --- 💻 電腦版 RWD --- */
         @media (min-width: 900px) {
-            .container {
-                max-width: 1100px; /* 變寬 */
-            }
-            
-            .layout-wrapper {
-                display: grid;
-                grid-template-columns: 400px 1fr; /* 左邊固定400px，右邊自動填滿 */
-                gap: 30px;
-                align-items: start; /* 頂部對齊 */
-            }
-
-            /* 強制右側顯示區在計算前佔位，避免跑版 */
-            .right-panel-wrapper {
-                min-height: 100px;
-            }
-
-            .result-panel { margin-top: 0; } /* 移除電腦版多餘的上方間距 */
-            .diagram-box { height: 500px; } /* 電腦版圖可以再高一點 */
+            .container { max-width: 1100px; }
+            .layout-wrapper { display: grid; grid-template-columns: 400px 1fr; gap: 30px; align-items: start; }
+            .right-panel-wrapper { min-height: 100px; }
+            .result-panel { margin-top: 0; } 
+            .diagram-box { height: 500px; } 
         }
 
-        /* --- 📱 手機版微調 --- */
+        /* --- 📱 手機版 RWD --- */
         @media (max-width: 480px) {
             .input-grid { grid-template-columns: 1fr; gap: 8px; }
             .compare-table td, .compare-table th { padding: 6px; font-size: 0.9rem; }
@@ -311,7 +283,7 @@
                     <label>本管尺寸 (內徑)</label>
                     <select id="pipeB">
                         <option value="2">1/2" (2cm)</option>
-                        <option value="3" selected>3/4" (3cm)</option>
+                        <option value="3">3/4" (3cm)</option>
                         <option value="4">1" (4cm)</option>
                         <option value="5">1-1/2" (5cm)</option>
                         <option value="6">2" (6cm)</option>
@@ -468,7 +440,6 @@
             else el.classList.remove('hidden');
         });
 
-        // 切換模式時清空，但不隱藏容器本身，保持佈局
         document.getElementById('resultPanel').style.display = 'none';
         document.getElementById('diagram').style.display = 'none';
         document.getElementById('adjustPanel').style.display = 'none';
@@ -483,13 +454,54 @@
     }
 
     function adjustOffset(pipe, delta) {
+        // 新增：預判邏輯 - 若下移會超出安全下限，則不執行
+        var H = Number(document.getElementById('floorHeight').value);
+        var D = Number(document.getElementById('beamDepth').value);
+        var T = Number(document.getElementById('slabThick').value);
+        var dropVal = Number(document.getElementById('slabDrop').value);
+        var dropType = document.getElementById('dropType').value;
+        if(dropVal < 0) dropVal = 0;
+        var offsetVal = (dropType === 'drop') ? dropVal : -dropVal;
+        
+        var SA = Number(document.getElementById('sleeveA').value);
+        var SB = Number(document.getElementById('sleeveB').value);
+        
+        // 計算安全下限
+        var oneThird = Math.ceil(D / 3);
+        var safeBotFL = H - (oneThird * 2); // 安全區底部高程
+        
+        // 計算物理上限
+        var safeTopFL = H - oneThird;
+        var slabBotFL = H - T - offsetVal;
+        var limitTop = Math.min(safeTopFL, slabBotFL);
+        
+        var currentOffset, sleeveDia;
         if (pipe === 'A') {
-            if (g_offsetA + delta < 0) g_offsetA = 0;
-            else g_offsetA += delta;
+            currentOffset = g_offsetA;
+            sleeveDia = SA;
         } else {
-            if (g_offsetB + delta < 0) g_offsetB = 0;
-            else g_offsetB += delta;
+            currentOffset = g_offsetB;
+            sleeveDia = SB;
         }
+        
+        var newOffset = currentOffset + delta;
+        
+        // 檢查上界
+        if (newOffset < 0) newOffset = 0;
+        
+        // 檢查下界：如果這次移動會導致 套管底 < 安全區底，且是按下移 (delta > 0)，則禁止
+        // Pipe Bottom FL = (limitTop - newOffset) - sleeveDia
+        var nextBotFL = (limitTop - newOffset) - sleeveDia;
+        
+        if (nextBotFL < safeBotFL && delta > 0) {
+            // 阻擋操作，不更新 offset
+            return;
+        }
+        
+        // 通過檢查，更新變數
+        if (pipe === 'A') g_offsetA = newOffset;
+        else g_offsetB = newOffset;
+        
         runUpdate();
     }
 
@@ -532,7 +544,8 @@
             var bsCenA = slabBotFL - sCenA;
             var bsBotA = slabBotFL - sBotA;
 
-            var isCollide = false;
+            var isUnsafeA = false;
+            var isUnsafeB = false;
             var statusMsg = "✅ 安全 Pass";
             var statusColor = "#2e7d32";
             var statusBg = "#e8f5e9";
@@ -596,8 +609,16 @@
                 }
             }
 
-            // UI 更新
-            document.getElementById('offsetA').innerText = (g_offsetA===0) ? "貼齊上限" : "降 " + g_offsetA + "cm";
+            // UI 更新: 增加是否到達下限的提示
+            var limitReachedA = (sBotA <= safeBotFL); // 其實是 ==，但用 <= 保險
+            var txtA = (g_offsetA===0) ? "貼齊上限" : "降 " + g_offsetA + "cm";
+            if (limitReachedA) txtA += " <span style='color:#c62828'>(已達安全下限)</span>";
+            document.getElementById('offsetA').innerHTML = txtA;
+
+            var limitReachedB = (sBotB <= safeBotFL);
+            var txtB = (g_offsetB===0) ? "貼齊上限" : "降 " + g_offsetB + "cm";
+            if (currentMode === 'dual' && limitReachedB) txtB += " <span style='color:#c62828'>(已達安全下限)</span>";
+            document.getElementById('offsetB').innerHTML = txtB;
             
             document.getElementById('resBsTopA').innerText = Math.round(bsTopA) + " cm";
             document.getElementById('resBsCenA').innerText = Math.round(bsCenA) + " cm";
@@ -608,7 +629,6 @@
             document.getElementById('resBotA').innerText = Math.round(pBotA);
 
             if (currentMode === 'dual') {
-                document.getElementById('offsetB').innerText = (g_offsetB===0) ? "貼齊上限" : "降 " + g_offsetB + "cm";
                 
                 document.getElementById('resBsTopB').innerText = Math.round(bsTopB) + " cm";
                 document.getElementById('resBsCenB').innerText = Math.round(bsCenB) + " cm";
@@ -644,7 +664,7 @@
             document.getElementById('resultPanel').style.display = 'block';
             document.getElementById('diagram').style.display = 'block';
 
-            drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsCenA, bsCenB, isCollide, oneThird);
+            drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsCenA, bsCenB, isUnsafeA, isUnsafeB, oneThird);
             
         } catch(e) {
             console.error(e);
@@ -652,7 +672,7 @@
         }
     }
 
-    function drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsA, bsB, isCollide, oneThirdVal) {
+    function drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsA, bsB, isUnsafeA, isUnsafeB, oneThirdVal) {
         var wrapper = document.getElementById('beamVisual');
         wrapper.innerHTML = '';
         var leftStruct = document.getElementById('leftStructure');
@@ -676,28 +696,45 @@
         
         // 結構
         var slabDiv = document.createElement('div');
-        slabDiv.className = 'zone zone-slab';
+        slabDiv.className = 'abs-zone zone-slab';
         slabDiv.style.height = slabPx + 'px';
+        slabDiv.style.top = '0px'; 
         slabDiv.innerText = "板";
         wrapper.appendChild(slabDiv);
 
         var topDangerH = oneThirdVal - T; 
         if (topDangerH > 0) {
-            var dangerTop = document.createElement('div');
-            dangerTop.className = 'zone zone-danger';
-            dangerTop.style.height = (topDangerH * scale) + 'px';
-            wrapper.appendChild(dangerTop);
-        } 
+            var divDangerTop = document.createElement('div');
+            divDangerTop.className = 'abs-zone zone-danger';
+            divDangerTop.style.top = '0px';
+            divDangerTop.style.height = oneThirdPx + 'px';
+            wrapper.appendChild(divDangerTop);
+        }
 
-        var safeDiv = document.createElement('div');
-        safeDiv.className = 'zone zone-safe';
-        safeDiv.style.height = oneThirdPx + 'px';
-        safeDiv.innerText = "安全區";
-        wrapper.appendChild(safeDiv);
-        var dangerBot = document.createElement('div');
-        dangerBot.className = 'zone zone-danger';
-        dangerBot.style.height = oneThirdPx + 'px';
-        wrapper.appendChild(dangerBot);
+        var divSafe = document.createElement('div');
+        divSafe.className = 'abs-zone zone-safe';
+        divSafe.style.top = oneThirdPx + 'px';
+        divSafe.style.height = oneThirdPx + 'px';
+        divSafe.innerText = "安全區";
+        wrapper.appendChild(divSafe);
+
+        // 安全區界線
+        var lineTop = document.createElement('div');
+        lineTop.className = 'limit-line';
+        lineTop.style.top = (oneThirdPx - 2) + 'px';
+        wrapper.appendChild(lineTop);
+
+        var twoThirdPx = oneThirdPx * 2;
+        var lineBot = document.createElement('div');
+        lineBot.className = 'limit-line';
+        lineBot.style.top = twoThirdPx + 'px';
+        wrapper.appendChild(lineBot);
+
+        var divDangerBot = document.createElement('div');
+        divDangerBot.className = 'abs-zone zone-danger';
+        divDangerBot.style.top = twoThirdPx + 'px';
+        divDangerBot.style.height = oneThirdPx + 'px';
+        wrapper.appendChild(divDangerBot);
 
         // 左側結構
         if (offsetVal > 0) {
@@ -760,11 +797,29 @@
         divSA.style.top = centerAPx + 'px';
         divSA.style.left = (currentMode === 'single') ? '50%' : '35%';
 
+        // 管 A 顏色控制
+        if (isUnsafeA) {
+            divSA.style.borderColor = '#c62828';
+            divSA.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
+        }
+
         var divPA = document.createElement('div');
         divPA.className = 'pipe-a';
         divPA.style.width = pipeAPx + 'px';
         divPA.style.height = pipeAPx + 'px';
+        
+        // 本管A也變紅
+        if (isUnsafeA) {
+            divPA.style.borderColor = '#b71c1c';
+            divPA.style.backgroundColor = 'rgba(211, 47, 47, 0.9)';
+        }
+
         divSA.appendChild(divPA);
+        
+        var dotA = document.createElement('div');
+        dotA.className = 'center-dot';
+        divSA.appendChild(dotA);
+
         document.getElementById('diagram').appendChild(divSA);
 
         if (centerAPx > bsLineTop) {
@@ -784,16 +839,29 @@
             divSB.style.top = centerBPx + 'px';
             divSB.style.left = '65%'; 
 
+            if (isUnsafeB) {
+                divSB.style.borderColor = '#c62828';
+                divSB.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
+            }
+
             var divPB = document.createElement('div');
             divPB.className = 'pipe-b';
             divPB.style.width = pipeBPx + 'px';
             divPB.style.height = pipeBPx + 'px';
+            
+            if (isUnsafeB) {
+                divPB.style.borderColor = '#b71c1c';
+                divPB.style.backgroundColor = 'rgba(211, 47, 47, 0.9)';
+            }
+
             divSB.appendChild(divPB);
+            
+            var dotB = document.createElement('div');
+            dotB.className = 'center-dot';
+            divSB.appendChild(dotB);
+
             document.getElementById('diagram').appendChild(divSB);
 
-            if (isCollide) {
-                // 移除碰撞紅底
-            }
             if (centerBPx > bsLineTop) {
                 var lineB = createBsLine(bsLineTop, centerBPx, bsB, '85%', true);
                 bsLayer.appendChild(lineB);
