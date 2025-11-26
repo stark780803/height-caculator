@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>少翔機電 - 穿樑高層計算機 V15.0</title>
+    <style>
+        /* 全局設定 */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
+            background-color: #f0f4f8; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; /* 改為靠上對齊，避免電腦版垂直置中導致長度問題 */
+            margin: 0; 
+            padding: 20px; 
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        .container { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            width: 100%; 
+            max-width: 1200px; /* 電腦版允許更寬 */
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        h2 { 
+            color: #263238; 
+            text-align: center; 
+            margin-top: 0;
+            margin-bottom: 20px; 
+            border-bottom: 3px solid #00897b; 
+            padding-bottom: 15px; 
+            font-size: 1.5rem; 
+        }
+
+        /* --- 版面佈局 (Flexbox Layout) --- */
+        .main-layout {
+            display: flex;
+            flex-direction: column; /* 手機預設垂直 */
+            gap: 30px;
+        }
+
+        /* 左側操作區 */
+        .control-section {
+            flex: 1;
+        }
+
+        /* 右側顯示區 */
+        .display-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- 電腦版 RWD 設定 (寬度 > 900px) --- */
+        @media (min-width: 900px) {
+            .main-layout {
+                flex-direction: row; /* 改為左右並排 */
+                align-items: flex-start;
+            }
+            .control-section {
+                flex: 0 0 400px; /* 左側固定寬度 */
+                position: sticky; /* 讓操作區在捲動時跟隨 (選用) */
+                top: 20px;
+            }
+            .display-section {
+                flex: 1; /* 右側填滿 */
+            }
+            /* 電腦版圖示可以再高一點 */
+            .diagram-box {
+                height: 500px !important;
+            }
+        }
+
+        /* --- 元件樣式 --- */
+
+        /* 模式切換按鈕 */
+        .mode-switch {
+            display: flex;
+            background: #eceff1;
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .mode-opt {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #546e7a;
+            transition: 0.3s;
+        }
+        .mode-opt.active {
+            background: white;
+            color: #00897b;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 輸入網格 */
+        .input-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+        }
+        
+        .group-header {
+            grid-column: span 2;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #555;
+            background: #eee;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .badge-a { background: #2196f3; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+        .badge-b { background: #ff9800; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #455a64; font-size: 0.9rem; }
+        
+        input, select { 
+            width: 100%; padding: 12px; border: 2px solid #cfd8dc; border-radius: 8px; font-size: 16px; 
+            box-sizing: border-box; background: #fff; -webkit-appearance: none; 
+        }
+        input:focus, select:focus { border-color: #00897b; outline: none; }
+        .drop-input { border-color: #ffb74d; background: #fff8e1; }
+
+        /* 升降板組合 */
+        .slab-adj-group { display: flex; gap: 5px; }
+        .slab-adj-group select { width: 45%; background: #fff8e1; border-color: #ffb74d; }
+        .slab-adj-group input { width: 55%; border-color: #ffb74d; background: #fff8e1;}
+
+        .hidden { display: none !important; }
+
+        .main-btn { 
+            width: 100%; padding: 15px; background-color: #00897b; color: white; border: none; 
+            border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s;
+        }
+        .main-btn:hover { background-color: #00796b; transform: translateY(-2px); }
+        .main-btn:active { transform: scale(0.98); }
+
+        /* 微調控制 */
+        .adjust-panel { 
+            display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #ffe0b2;
+        }
+        .adjust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .adj-col { text-align: center; }
+        .adj-col h4 { margin: 0 0 8px 0; font-size: 1rem; color: #444; }
+        
+        .adj-btn {
+            width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; 
+            font-size: 0.9rem; margin-bottom: 5px;
+            display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;
+        }
+        .adj-btn:hover { filter: brightness(0.95); }
+        .btn-a.up { background: #bbdefb; color: #0d47a1; }
+        .btn-a.down { background: #90caf9; color: #0d47a1; }
+        .btn-b.up { background: #ffe0b2; color: #e65100; }
+        .btn-b.down { background: #ffcc80; color: #e65100; }
+
+        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; }
+
+        /* 結果表格 */
+        .result-panel { background: #e0f2f1; border-radius: 10px; display: none; overflow: hidden; border: 1px solid #b2dfdb; }
+        
+        .compare-table { width: 100%; border-collapse: collapse; }
+        .compare-table th { background: #b2dfdb; color: #00695c; padding: 10px; font-size: 0.9rem; }
+        .compare-table td { padding: 10px; border-bottom: 1px solid #cfd8dc; text-align: center; font-size: 1.05rem; vertical-align: middle; }
+        .row-label { text-align: left !important; font-weight: bold; color: #455a64; font-size: 0.95rem; width: 35%; background: #f5f5f5; }
+        
+        .val-a { color: #1976d2; font-weight: bold; }
+        .val-b { color: #f57c00; font-weight: bold; }
+        
+        .status-box { padding: 12px; text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 0; }
+        
+        /* 圖示區 */
+        .diagram-box { 
+            height: 400px; 
+            position: relative; 
+            border: 2px solid #ddd; 
+            background: #fff; 
+            display: none; 
+            overflow: hidden; 
+            border-radius: 10px; 
+            padding-left: 0; 
+        }
+        
+        /* 視覺元素樣式 (同前版) */
+        .beam-col { position: absolute; right: 0; top: 30px; width: 50%; display: flex; flex-direction: column; border-left: 3px solid #333; border-bottom: 3px solid #333; border-top: 2px solid #999; background: #eceff1; box-sizing: border-box; }
+        .zone { display: flex; align-items: center; justify-content: center; font-size: 11px; width: 100%; position: relative; }
+        .zone-slab { background: #cfd8dc; color: #455a64; font-weight: bold; border-bottom: 2px solid #455a64; z-index: 2; box-sizing: border-box;}
+        .zone-danger { background: rgba(198, 40, 40, 0.1); box-sizing: border-box;}
+        .zone-safe { background: rgba(67, 160, 71, 0.2); color: #2e7d32; font-weight: bold; border-top: 2px dashed #43a047; border-bottom: 2px dashed #43a047; z-index: 1; box-sizing: border-box;}
+
+        .sleeve-a { position: absolute; background: rgba(33, 150, 243, 0.15); border: 2px dashed #1976d2; border-radius: 50%; z-index: 5; left: 50%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
+        .pipe-a { position: absolute; background: rgba(33, 150, 243, 0.8); border: 1px solid #0d47a1; border-radius: 50%; z-index: 10; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .sleeve-b { position: absolute; background: rgba(255, 152, 0, 0.15); border: 2px dashed #f57c00; border-radius: 50%; z-index: 6; left: 65%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
+        .pipe-b { position: absolute; background: rgba(255, 152, 0, 0.8); border: 1px solid #e65100; border-radius: 50%; z-index: 11; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+        .topping-visual { position: absolute; left: 130px; right: 50%; background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 5px, #e0e0e0 5px, #e0e0e0 10px); z-index: 1; border-bottom: 1px dashed #999; text-align: center; font-size: 10px; color: #666; display: flex; align-items: center; justify-content: center;}
+        .slab-visual { position: absolute; left: 130px; right: 50%; background: #90a4ae; border-bottom: 1px solid #78909c; z-index: 2; color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center;}
+        .ref-line-bs { position: absolute; left: 130px; width: 100%; border-bottom: 2px dotted #d84315; z-index: 5; }
+        
+        .dim-line-vertical { position: absolute; width: 1px; background: #555; display: flex; align-items: center; justify-content: center; }
+        .dim-line-vertical::before { content: ''; position: absolute; width: 8px; height: 1px; background: #555; left: -3.5px; top: 0; }
+        .dim-line-vertical::after { content: ''; position: absolute; width: 8px; height: 1px; background: #555; left: -3.5px; bottom: 0; }
+        .break-symbol { position: absolute; bottom: 0; left: 130px; width: 100%; height: 10px; background: repeating-linear-gradient(45deg, #fff, #fff 2px, #ccc 2px, #ccc 4px); opacity: 0.5; }
+        .dim-text-label { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.95); padding: 1px 4px; font-size: 11px; font-weight: bold; color: #333; border: 1px solid #ccc; border-radius: 3px; white-space: nowrap; z-index: 20; }
+        .fl-top-label { position: absolute; top: 5px; left: 132px; font-size: 12px; color: #333; font-weight: bold; z-index: 20; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #ddd; }
+
+        /* Footer */
+        .footer { text-align: center; margin-top: 20px; color: #90a4ae; font-size: 0.85rem; letter-spacing: 0.5px; }
+
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            .input-grid { grid-template-columns: 1fr; gap: 8px; }
+            .group-header { margin-top: 15px; }
+            .sleeve-a { left: 40% !important; }
+            .sleeve-b { left: 60% !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏗️ 少翔機電 - 穿樑高層計算機</h2>
+    
+    <div class="main-layout">
+        
+        <div class="control-section">
+            <div class="mode-switch">
+                <div class="mode-opt active" id="modeSingle" onclick="changeMode('single')">🔘 單管模式</div>
+                <div class="mode-opt" id="modeDual" onclick="changeMode('dual')">⚪ 雙管碰撞</div>
+            </div>
+
+            <div class="input-grid">
+                <div class="group-header">📐 結構參數 (共用)</div>
+                <div><label>1. 層高 (板上 H)</label><input type="number" id="floorHeight" value="350" placeholder="350"></div>
+                <div><label>2. 樑深 (D)</label><input type="number" id="beamDepth" value="80"></div>
+                <div><label>3. 板厚 (T)</label><input type="number" id="slabThick" value="15"></div>
+                
+                <div style="grid-column: span 2;">
+                    <label style="color:#ef6c00;">4. 板位調整 (Slab Offset)</label>
+                    <div class="slab-adj-group">
+                        <select id="dropType">
+                            <option value="drop" selected>⬇ 降板 (Drop)</option>
+                            <option value="rise">⬆ 升板 (Rise)</option>
+                        </select>
+                        <input type="number" id="slabDrop" placeholder="0" value="0" inputmode="numeric">
+                    </div>
+                </div>
+
+                <div class="group-header" id="headerA"><span class="badge-a">管 A</span> 藍色</div>
+                <div id="inputA1">
+                    <label>套管 (外徑)</label>
+                    <select id="sleeveA">
+                        <option value="6">2" (6cm)</option>
+                        <option value="10">3" (10cm)</option>
+                        <option value="12">4" (12cm)</option>
+                        <option value="15">5" (15cm)</option>
+                        <option value="18" selected>6" (18cm)</option>
+                        <option value="22">8" (22cm)</option>
+                        <option value="28">10" (28cm)</option>
+                    </select>
+                </div>
+                <div id="inputA2">
+                    <label>本管 (內徑)</label>
+                    <select id="pipeA">
+                        <option value="2">1/2" (2cm)</option>
+                        <option value="3">3/4" (3cm)</option>
+                        <option value="4">1" (4cm)</option>
+                        <option value="5">1-1/2" (5cm)</option>
+                        <option value="6">2" (6cm)</option>
+                        <option value="10">3" (10cm)</option>
+                        <option value="12" selected>4" (12cm)</option>
+                        <option value="15">5" (15cm)</option>
+                        <option value="18">6" (18cm)</option>
+                    </select>
+                </div>
+
+                <div class="group-header hidden" id="headerB"><span class="badge-b">管 B</span> 橘色</div>
+                <div class="hidden" id="inputB1">
+                    <label>套管 (外徑)</label>
+                    <select id="sleeveB">
+                        <option value="6" selected>2" (6cm)</option>
+                        <option value="10">3" (10cm)</option>
+                        <option value="12">4" (12cm)</option>
+                        <option value="15">5" (15cm)</option>
+                        <option value="18">6" (18cm)</option>
+                        <option value="22">8" (22cm)</option>
+                        <option value="28">10" (28cm)</option>
+                    </select>
+                </div>
+                <div class="hidden" id="inputB2">
+                    <label>本管 (內徑)</label>
+                    <select id="pipeB">
+                        <option value="2">1/2" (2cm)</option>
+                        <option value="3" selected>3/4" (3cm)</option>
+                        <option value="4">1" (4cm)</option>
+                        <option value="5">1-1/2" (5cm)</option>
+                        <option value="6">2" (6cm)</option>
+                        <option value="10">3" (10cm)</option>
+                        <option value="12">4" (12cm)</option>
+                        <option value="15">5" (15cm)</option>
+                        <option value="18">6" (18cm)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="main-btn" onclick="startCalculation()">⚡ 開始計算</button>
+
+            <div class="adjust-panel" id="adjustPanel">
+                <div class="adjust-grid">
+                    <div class="adj-col" style="grid-column: span 2;" id="colA">
+                        <h4 style="color:#1565c0;">管 A 微調</h4>
+                        <div style="display:flex; gap:10px;">
+                            <button class="adj-btn btn-a up" onclick="adjustOffset('A', -1)">⬆ 1cm</button>
+                            <button class="adj-btn btn-a down" onclick="adjustOffset('A', 1)">⬇ 1cm</button>
+                        </div>
+                        <div class="offset-txt" id="offsetA">貼齊上限</div>
+                    </div>
+                    
+                    <div class="adj-col hidden" id="colB">
+                        <h4 style="color:#e65100;">管 B 微調</h4>
+                        <div style="display:flex; gap:10px;">
+                            <button class="adj-btn btn-b up" onclick="adjustOffset('B', -1)">⬆ 1cm</button>
+                            <button class="adj-btn btn-b down" onclick="adjustOffset('B', 1)">⬇ 1cm</button>
+                        </div>
+                        <div class="offset-txt" id="offsetB">貼齊上限</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="display-section">
+            <div class="result-panel" id="resultPanel">
+                <div class="status-box" id="statusBox"></div>
+
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th style="width:30%">項目</th>
+                            <th style="color:#0d47a1;">管 A</th>
+                            <th style="color:#e65100;" class="col-b hidden">管 B</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="row-label" colspan="3" style="text-align:center!important; background:#e0f7fa;">👷 現場放樣 (B.S.)</td></tr>
+                        <tr>
+                            <td class="row-label">套管管頂</td>
+                            <td class="val-a" id="resBsTopA"></td>
+                            <td class="val-b col-b hidden" id="resBsTopB"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-label" style="text-decoration: underline;">套管管心</td>
+                            <td class="val-a" id="resBsCenA" style="font-size:1.2rem;"></td>
+                            <td class="val-b col-b hidden" id="resBsCenB" style="font-size:1.2rem;"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-label">套管管底</td>
+                            <td class="val-a" id="resBsBotA"></td>
+                            <td class="val-b col-b hidden" id="resBsBotB"></td>
+                        </tr>
+
+                        <tr><td class="row-label" colspan="3" style="text-align:center!important; background:#fff3e0;">📍 絕對高程 (FL+)</td></tr>
+                        <tr>
+                            <td class="row-label">本管管頂</td>
+                            <td class="val-a" id="resTopA"></td>
+                            <td class="val-b col-b hidden" id="resTopB"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-label">本管管心</td>
+                            <td class="val-a" id="resCenA"></td>
+                            <td class="val-b col-b hidden" id="resCenB"></td>
+                        </tr>
+                        <tr>
+                            <td class="row-label">本管管底</td>
+                            <td class="val-a" id="resBotA"></td>
+                            <td class="val-b col-b hidden" id="resBotB"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="padding:8px; font-size:0.9rem; color:#666; text-align:center;">
+                    安全區: FL+<span id="safeRange"></span><br>
+                    <span style="color:#004d40; font-weight:bold;">樓高(板下): <span id="lblRoomH_res"></span> | 樑下淨高: <span id="lblClearH_res"></span></span>
+                </div>
+            </div>
+
+            <div class="diagram-box" id="diagram">
+                <div class="beam-col" id="beamVisual"></div>
+                <div id="leftStructure"></div>
+                <div class="ref-line-bs" id="slabLine">
+                    <span style="position:absolute; right:100%; top:-12px; font-size:12px; color:#d84315; white-space:nowrap; font-weight:bold;" id="bsLabel">板底</span>
+                </div>
+                
+                <div class="fl-top-label">⏉ 板頂 FL+<span id="labelH"></span></div>
+
+                <div id="storyHeightDim" class="dim-line-vertical" style="left: 15px;">
+                    <div class="dim-text-label" style="left: 5px;">層高 <span id="lblStoryH"></span></div>
+                </div>
+
+                <div id="roomHeightDim" class="dim-line-vertical" style="left: 75px;">
+                    <div class="dim-text-label" style="left: 5px;">樓高 <span id="lblRoomH"></span></div>
+                </div>
+
+                <div id="clearHeightDim" class="dim-line-vertical" style="left: 85%;">
+                    <div class="dim-text-label" style="left: 5px;">淨高 <span id="lblClearH"></span></div>
+                </div>
+
+                <div id="bsVisualLayer" style="position:absolute; width:100%; height:100%; pointer-events:none;"></div>
+                
+                <div class="break-symbol"></div>
+                <div style="position: absolute; bottom: 15px; left: 15px; font-size: 11px; color: #666;">⏊ 往地面 (FL)</div>
+            </div>
+            
+            <div class="footer">
+                Presented by <strong>Stark</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var currentMode = 'single';
+    var g_offsetA = 0;
+    var g_offsetB = 0;
+
+    function changeMode(mode) {
+        currentMode = mode;
+        
+        document.getElementById('modeSingle').className = (mode === 'single') ? 'mode-opt active' : 'mode-opt';
+        document.getElementById('modeDual').className = (mode === 'dual') ? 'mode-opt active' : 'mode-opt';
+
+        const elsToToggle = ['headerB', 'inputB1', 'inputB2', 'colB'];
+        elsToToggle.forEach(id => {
+            const el = document.getElementById(id);
+            if(mode === 'single') el.classList.add('hidden');
+            else el.classList.remove('hidden');
+        });
+
+        const colA = document.getElementById('colA');
+        if(mode === 'single') {
+            colA.style.gridColumn = "span 2"; 
+        } else {
+            colA.style.gridColumn = "span 1"; 
+        }
+
+        const colBs = document.querySelectorAll('.col-b');
+        colBs.forEach(el => {
+            if(mode === 'single') el.classList.add('hidden');
+            else el.classList.remove('hidden');
+        });
+
+        document.getElementById('resultPanel').style.display = 'none';
+        document.getElementById('diagram').style.display = 'none';
+        document.getElementById('adjustPanel').style.display = 'none';
+        g_offsetA = 0;
+        g_offsetB = 0;
+    }
+
+    function startCalculation() {
+        g_offsetA = 0;
+        g_offsetB = 0;
+        runUpdate();
+    }
+
+    function adjustOffset(pipe, delta) {
+        if (pipe === 'A') {
+            if (g_offsetA + delta < 0) g_offsetA = 0;
+            else g_offsetA += delta;
+        } else {
+            if (g_offsetB + delta < 0) g_offsetB = 0;
+            else g_offsetB += delta;
+        }
+        runUpdate();
+    }
+
+    function runUpdate() {
+        try {
+            var H = Number(document.getElementById('floorHeight').value);
+            var D = Number(document.getElementById('beamDepth').value);
+            var T = Number(document.getElementById('slabThick').value);
+            var dropVal = Number(document.getElementById('slabDrop').value);
+            var dropType = document.getElementById('dropType').value; 
+            
+            if(dropVal < 0) dropVal = 0;
+            var offsetVal = (dropType === 'drop') ? dropVal : -dropVal;
+
+            var SA = Number(document.getElementById('sleeveA').value);
+            var PA = Number(document.getElementById('pipeA').value);
+            
+            if(!H || !D || !T || !SA || !PA) {
+                alert("請輸入結構與管 A 數值"); return;
+            }
+
+            var oneThird = Math.floor(D / 3);
+            var safeTopFL = H - oneThird;
+            var safeBotFL = H - (oneThird * 2);
+            var slabBotFL = H - T - offsetVal;
+            var limitTop = Math.min(safeTopFL, slabBotFL);
+            var clearHeight = H - D;
+            var roomHeight = slabBotFL; 
+
+            // 計算 A
+            var sTopA = limitTop - g_offsetA;
+            var sCenA = sTopA - (SA / 2);
+            var sBotA = sTopA - SA;
+            var pCenA = sCenA;
+            var pTopA = pCenA + (PA/2);
+            var pBotA = pCenA - (PA/2);
+
+            // B.S. 計算 (A)
+            var bsTopA = slabBotFL - sTopA;
+            var bsCenA = slabBotFL - sCenA;
+            var bsBotA = slabBotFL - sBotA;
+
+            var isCollide = false;
+            var statusMsg = "✅ 安全 Pass";
+            var statusColor = "#2e7d32";
+            var statusBg = "#e8f5e9";
+
+            if (sBotA < safeBotFL) {
+                statusMsg = "❌ 管 A 超出安全下緣";
+                statusColor = "#c62828";
+                statusBg = "#ffebee";
+            }
+            if (SA > oneThird) {
+                 statusMsg = "❌ 危險！套管 A 過大";
+                 statusColor = "#c62828";
+                 statusBg = "#ffebee";
+            }
+
+            // B變數初始化
+            var SB=0, PB=0, bsTopB=0, bsCenB=0, bsBotB=0, pTopB=0, pCenB=0, pBotB=0, sTopB=0, sCenB=0, sBotB=0;
+
+            if (currentMode === 'dual') {
+                SB = Number(document.getElementById('sleeveB').value);
+                PB = Number(document.getElementById('pipeB').value);
+                if(!SB || !PB) SB = 6, PB = 3; 
+
+                sTopB = limitTop - g_offsetB;
+                sCenB = sTopB - (SB / 2);
+                sBotB = sTopB - SB;
+                pCenB = sCenB;
+                pTopB = pCenB + (PB/2);
+                pBotB = pCenB - (PB/2);
+                
+                bsTopB = slabBotFL - sTopB;
+                bsCenB = slabBotFL - sCenB;
+                bsBotB = slabBotFL - sBotB;
+
+                if (sBotB < safeBotFL) {
+                    statusMsg += " | ❌ 管 B 超出下緣";
+                    statusColor = "#c62828";
+                    statusBg = "#ffebee";
+                }
+                if (SB > oneThird) {
+                     statusMsg += " | ❌ 套管 B 過大";
+                }
+
+                if (sBotA < sTopB && sTopA > sBotB) {
+                    isCollide = true;
+                    statusMsg = "❌ 兩管嚴重碰撞！";
+                    statusColor = "#c62828";
+                    statusBg = "#ffebee";
+                } else {
+                    var dist = (sBotA >= sTopB) ? (sBotA - sTopB) : (sBotB - sTopA);
+                    if (dist < 5) {
+                        statusMsg = "⚠️ 間距過近 (" + dist.toFixed(1) + "cm)";
+                        statusColor = "#ef6c00";
+                        statusBg = "#fff3e0";
+                    }
+                }
+            }
+
+            // UI 更新
+            document.getElementById('offsetA').innerText = (g_offsetA===0) ? "貼齊上限" : "降 " + g_offsetA + "cm";
+            
+            document.getElementById('resBsTopA').innerText = Math.round(bsTopA) + " cm";
+            document.getElementById('resBsCenA').innerText = Math.round(bsCenA) + " cm";
+            document.getElementById('resBsBotA').innerText = Math.round(bsBotA) + " cm";
+
+            document.getElementById('resTopA').innerText = Math.round(pTopA);
+            document.getElementById('resCenA').innerText = Math.round(pCenA);
+            document.getElementById('resBotA').innerText = Math.round(pBotA);
+
+            if (currentMode === 'dual') {
+                document.getElementById('offsetB').innerText = (g_offsetB===0) ? "貼齊上限" : "降 " + g_offsetB + "cm";
+                
+                document.getElementById('resBsTopB').innerText = Math.round(bsTopB) + " cm";
+                document.getElementById('resBsCenB').innerText = Math.round(bsCenB) + " cm";
+                document.getElementById('resBsBotB').innerText = Math.round(bsBotB) + " cm";
+
+                document.getElementById('resTopB').innerText = Math.round(pTopB);
+                document.getElementById('resCenB').innerText = Math.round(pCenB);
+                document.getElementById('resBotB').innerText = Math.round(pBotB);
+            }
+
+            document.getElementById('safeRange').innerText = Math.round(safeBotFL) + "~" + Math.round(safeTopFL);
+            
+            document.getElementById('labelH').innerText = H;
+            document.getElementById('lblStoryH').innerText = H;
+            document.getElementById('lblRoomH').innerText = roomHeight;
+            document.getElementById('lblClearH').innerText = clearHeight;
+            
+            document.getElementById('lblRoomH_res').innerText = roomHeight + "cm";
+            document.getElementById('lblClearH_res').innerText = clearHeight + "cm";
+
+            var bsLabelText = "板底";
+            if (dropVal > 0) {
+                bsLabelText = (dropType === 'drop') ? "降板底" : "升板底";
+            }
+            document.getElementById('bsLabel').innerText = bsLabelText;
+
+            var statBox = document.getElementById('statusBox');
+            statBox.innerText = statusMsg;
+            statBox.style.color = statusColor;
+            statBox.style.backgroundColor = statusBg;
+
+            document.getElementById('adjustPanel').style.display = 'block';
+            document.getElementById('resultPanel').style.display = 'block';
+            document.getElementById('diagram').style.display = 'block';
+
+            drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsCenA, bsCenB, isCollide);
+            
+        } catch(e) {
+            console.error(e);
+            alert("計算發生錯誤，請檢查數值");
+        }
+    }
+
+    function drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsA, bsB, isCollide) {
+        var wrapper = document.getElementById('beamVisual');
+        wrapper.innerHTML = '';
+        var leftStruct = document.getElementById('leftStructure');
+        leftStruct.innerHTML = '';
+        var bsLayer = document.getElementById('bsVisualLayer');
+        bsLayer.innerHTML = '';
+
+        var displayRangeCm = D * 1.5; 
+        var boxHeight = 400; 
+        var scale = boxHeight / displayRangeCm; 
+        if (!isFinite(scale) || scale <= 0) scale = 1;
+
+        var beamPx = D * scale;
+        var slabPx = T * scale;
+        var offsetPx = offsetVal * scale; 
+        var oneThirdPx = (D/3) * scale;
+        var topOffset = 30; 
+        
+        wrapper.style.height = beamPx + 'px';
+        wrapper.style.top = topOffset + 'px'; 
+        
+        // 結構
+        var slabDiv = document.createElement('div');
+        slabDiv.className = 'zone zone-slab';
+        slabDiv.style.height = slabPx + 'px';
+        slabDiv.innerText = "板";
+        wrapper.appendChild(slabDiv);
+
+        var topDangerH = (D/3) - T;
+        if (topDangerH > 0) {
+            var dangerTop = document.createElement('div');
+            dangerTop.className = 'zone zone-danger';
+            dangerTop.style.height = (topDangerH * scale) + 'px';
+            wrapper.appendChild(dangerTop);
+        }
+        var safeDiv = document.createElement('div');
+        safeDiv.className = 'zone zone-safe';
+        safeDiv.style.height = oneThirdPx + 'px';
+        safeDiv.innerText = "安全區";
+        wrapper.appendChild(safeDiv);
+        var dangerBot = document.createElement('div');
+        dangerBot.className = 'zone zone-danger';
+        dangerBot.style.height = oneThirdPx + 'px';
+        wrapper.appendChild(dangerBot);
+
+        // 左側結構 (Left: 130px)
+        if (offsetVal > 0) {
+            var topping = document.createElement('div');
+            topping.className = 'topping-visual';
+            topping.style.height = offsetPx + 'px';
+            topping.style.top = topOffset + 'px'; 
+            topping.innerText = "增築";
+            leftStruct.appendChild(topping);
+            
+            var leftSlab = document.createElement('div');
+            leftSlab.className = 'slab-visual';
+            leftSlab.style.height = slabPx + 'px';
+            leftSlab.style.top = (topOffset + offsetPx) + 'px'; 
+            leftSlab.innerText = "降板";
+            leftStruct.appendChild(leftSlab);
+        } 
+        else if (offsetVal < 0) {
+            var leftSlab = document.createElement('div');
+            leftSlab.className = 'slab-visual';
+            leftSlab.style.height = slabPx + 'px';
+            leftSlab.style.top = (topOffset + offsetPx) + 'px'; 
+            leftSlab.innerText = "升板";
+            leftStruct.appendChild(leftSlab);
+        }
+        else {
+            var leftSlab = document.createElement('div');
+            leftSlab.className = 'slab-visual';
+            leftSlab.style.height = slabPx + 'px';
+            leftSlab.style.top = topOffset + 'px';
+            leftSlab.innerText = "板";
+            leftStruct.appendChild(leftSlab);
+        }
+
+        var bsLineTop = topOffset + offsetPx + slabPx;
+        document.getElementById('slabLine').style.top = bsLineTop + 'px';
+
+        // 標示線調整
+        // 1. 層高 (最左 15px)
+        document.getElementById('storyHeightDim').style.top = topOffset + 'px';
+        document.getElementById('storyHeightDim').style.height = (boxHeight - topOffset) + 'px'; 
+        
+        // 2. 樓高 (左二 75px)
+        var roomLineTop = Math.max(0, bsLineTop);
+        document.getElementById('roomHeightDim').style.top = roomLineTop + 'px';
+        document.getElementById('roomHeightDim').style.height = (boxHeight - roomLineTop) + 'px';
+
+        // 3. 淨高 (樑底)
+        document.getElementById('clearHeightDim').style.top = (topOffset + beamPx) + 'px';
+        document.getElementById('clearHeightDim').style.height = (boxHeight - topOffset - beamPx) + 'px';
+
+        var oldPipes = document.querySelectorAll('.diagram-box > .sleeve-a, .diagram-box > .sleeve-b');
+        oldPipes.forEach(p => p.remove());
+
+        var centerAPx = bsLineTop + (bsA * scale);
+        var sleeveAPx = SA * scale;
+        var pipeAPx = PA * scale;
+
+        var divSA = document.createElement('div');
+        divSA.className = 'sleeve-a';
+        divSA.style.width = sleeveAPx + 'px';
+        divSA.style.height = sleeveAPx + 'px';
+        divSA.style.top = centerAPx + 'px';
+        divSA.style.left = (currentMode === 'single') ? '50%' : '35%';
+
+        var divPA = document.createElement('div');
+        divPA.className = 'pipe-a';
+        divPA.style.width = pipeAPx + 'px';
+        divPA.style.height = pipeAPx + 'px';
+        divSA.appendChild(divPA);
+        document.getElementById('diagram').appendChild(divSA);
+
+        if (centerAPx > bsLineTop) {
+            var lineA = createBsLine(bsLineTop, centerAPx, bsA, (currentMode === 'single') ? '20%' : '15%');
+            bsLayer.appendChild(lineA);
+        }
+
+        if (currentMode === 'dual') {
+            var centerBPx = bsLineTop + (bsB * scale);
+            var sleeveBPx = SB * scale;
+            var pipeBPx = PB * scale;
+
+            var divSB = document.createElement('div');
+            divSB.className = 'sleeve-b';
+            divSB.style.width = sleeveBPx + 'px';
+            divSB.style.height = sleeveBPx + 'px';
+            divSB.style.top = centerBPx + 'px';
+            divSB.style.left = '65%'; 
+
+            var divPB = document.createElement('div');
+            divPB.className = 'pipe-b';
+            divPB.style.width = pipeBPx + 'px';
+            divPB.style.height = pipeBPx + 'px';
+            divSB.appendChild(divPB);
+            document.getElementById('diagram').appendChild(divSB);
+
+            if (isCollide) {
+                divSA.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
+                divSB.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
+            }
+            if (centerBPx > bsLineTop) {
+                var lineB = createBsLine(bsLineTop, centerBPx, bsB, '85%', true);
+                bsLayer.appendChild(lineB);
+            }
+        }
+    }
+
+    function createBsLine(topPx, bottomPx, val, leftPos, alignRight = false) {
+        var line = document.createElement('div');
+        line.style.position = 'absolute';
+        line.style.left = leftPos; 
+        line.style.top = topPx + 'px';
+        line.style.height = (bottomPx - topPx) + 'px';
+        line.style.width = '2px'; 
+        line.style.borderLeft = '2px dashed #d84315';
+        
+        var lbl = document.createElement('div');
+        lbl.innerText = "B.S." + Math.round(val);
+        lbl.style.position = 'absolute';
+        lbl.style.top = '50%';
+        if (alignRight) lbl.style.right = '5px';
+        else lbl.style.left = '5px';
+        
+        lbl.style.color = '#d84315';
+        lbl.style.fontSize = '12px';
+        lbl.style.fontWeight = 'bold';
+        lbl.style.transform = 'translateY(-50%)';
+        lbl.style.whiteSpace = 'nowrap';
+        lbl.style.background = 'rgba(255,255,255,0.8)';
+        lbl.style.padding = '2px 4px';
+        lbl.style.borderRadius = '4px';
+        
+        line.appendChild(lbl);
+        return line;
+    }
+</script>
+
+</body>
+</html>
