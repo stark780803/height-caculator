@@ -3,86 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>少翔機電 - 穿樑高層計算機 V15.0</title>
+    <title>少翔機電 - 穿樑高層計算機 V16.0</title>
     <style>
-        /* 全局設定 */
+        /* --- 基礎設定 --- */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; 
             background-color: #f0f4f8; 
             display: flex; 
             justify-content: center; 
-            align-items: flex-start; /* 改為靠上對齊，避免電腦版垂直置中導致長度問題 */
             margin: 0; 
-            padding: 20px; 
-            min-height: 100vh;
-            box-sizing: border-box;
+            padding: 15px; 
             -webkit-tap-highlight-color: transparent; 
         }
 
         .container { 
             background: white; 
             padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            border-radius: 16px; 
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08); 
             width: 100%; 
-            max-width: 1200px; /* 電腦版允許更寬 */
+            max-width: 600px; /* 手機預設寬度 */
             box-sizing: border-box;
-            transition: all 0.3s ease;
+            transition: max-width 0.3s ease; /* 讓寬度變化有動畫 */
         }
         
         h2 { 
             color: #263238; 
             text-align: center; 
-            margin-top: 0;
             margin-bottom: 20px; 
             border-bottom: 3px solid #00897b; 
-            padding-bottom: 15px; 
+            padding-bottom: 12px; 
             font-size: 1.5rem; 
         }
 
-        /* --- 版面佈局 (Flexbox Layout) --- */
-        .main-layout {
-            display: flex;
-            flex-direction: column; /* 手機預設垂直 */
-            gap: 30px;
+        /* --- 版面佈局系統 (Layout System) --- */
+        .layout-wrapper {
+            display: block; /* 手機預設單欄 */
         }
 
-        /* 左側操作區 */
-        .control-section {
-            flex: 1;
+        .left-panel-wrapper {
+            /* 操作區 */
         }
 
-        /* 右側顯示區 */
-        .display-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* --- 電腦版 RWD 設定 (寬度 > 900px) --- */
-        @media (min-width: 900px) {
-            .main-layout {
-                flex-direction: row; /* 改為左右並排 */
-                align-items: flex-start;
-            }
-            .control-section {
-                flex: 0 0 400px; /* 左側固定寬度 */
-                position: sticky; /* 讓操作區在捲動時跟隨 (選用) */
-                top: 20px;
-            }
-            .display-section {
-                flex: 1; /* 右側填滿 */
-            }
-            /* 電腦版圖示可以再高一點 */
-            .diagram-box {
-                height: 500px !important;
-            }
+        .right-panel-wrapper {
+            /* 顯示區 */
         }
 
         /* --- 元件樣式 --- */
-
-        /* 模式切換按鈕 */
+        /* 模式切換 */
         .mode-switch {
             display: flex;
             background: #eceff1;
@@ -114,15 +82,16 @@
             margin-bottom: 15px; 
         }
         
+        /* 分區標題 */
         .group-header {
             grid-column: span 2;
             font-size: 0.95rem;
             font-weight: bold;
             color: #555;
             background: #eee;
-            padding: 8px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
-            margin-top: 10px;
+            margin-top: 5px;
             display: flex; align-items: center; gap: 8px;
         }
         .badge-a { background: #2196f3; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
@@ -131,30 +100,31 @@
         label { display: block; margin-bottom: 6px; font-weight: bold; color: #455a64; font-size: 0.9rem; }
         
         input, select { 
-            width: 100%; padding: 12px; border: 2px solid #cfd8dc; border-radius: 8px; font-size: 16px; 
+            width: 100%; padding: 10px; border: 2px solid #cfd8dc; border-radius: 8px; font-size: 16px; 
             box-sizing: border-box; background: #fff; -webkit-appearance: none; 
         }
         input:focus, select:focus { border-color: #00897b; outline: none; }
         .drop-input { border-color: #ffb74d; background: #fff8e1; }
 
-        /* 升降板組合 */
+        /* 升降板組合輸入 */
         .slab-adj-group { display: flex; gap: 5px; }
         .slab-adj-group select { width: 45%; background: #fff8e1; border-color: #ffb74d; }
         .slab-adj-group input { width: 55%; border-color: #ffb74d; background: #fff8e1;}
 
         .hidden { display: none !important; }
 
+        /* 計算按鈕 */
         .main-btn { 
             width: 100%; padding: 15px; background-color: #00897b; color: white; border: none; 
             border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
         }
-        .main-btn:hover { background-color: #00796b; transform: translateY(-2px); }
         .main-btn:active { transform: scale(0.98); }
 
-        /* 微調控制 */
+        /* 微調控制 (放在左側) */
         .adjust-panel { 
-            display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #ffe0b2;
+            display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #ffe0b2;
         }
         .adjust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .adj-col { text-align: center; }
@@ -163,31 +133,37 @@
         .adj-btn {
             width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; 
             font-size: 0.9rem; margin-bottom: 5px;
-            display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
         }
-        .adj-btn:hover { filter: brightness(0.95); }
         .btn-a.up { background: #bbdefb; color: #0d47a1; }
         .btn-a.down { background: #90caf9; color: #0d47a1; }
         .btn-b.up { background: #ffe0b2; color: #e65100; }
         .btn-b.down { background: #ffcc80; color: #e65100; }
 
-        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; }
+        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; margin-top: 5px;}
 
-        /* 結果表格 */
-        .result-panel { background: #e0f2f1; border-radius: 10px; display: none; overflow: hidden; border: 1px solid #b2dfdb; }
+        /* 結果表格 (放在右側) */
+        .result-panel { 
+            background: #e0f2f1; 
+            border-radius: 10px; 
+            margin-top: 20px; /* 手機版間距 */
+            display: none; 
+            overflow: hidden; 
+            border: 1px solid #b2dfdb; 
+        }
         
         .compare-table { width: 100%; border-collapse: collapse; }
-        .compare-table th { background: #b2dfdb; color: #00695c; padding: 10px; font-size: 0.9rem; }
-        .compare-table td { padding: 10px; border-bottom: 1px solid #cfd8dc; text-align: center; font-size: 1.05rem; vertical-align: middle; }
-        .row-label { text-align: left !important; font-weight: bold; color: #455a64; font-size: 0.95rem; width: 35%; background: #f5f5f5; }
-        
+        .compare-table th { background: #b2dfdb; color: #00695c; padding: 8px; font-size: 0.9rem; }
+        .compare-table td { padding: 8px; border-bottom: 1px solid #cfd8dc; text-align: center; font-size: 1rem; vertical-align: middle; }
+        .row-label { text-align: left !important; font-weight: bold; color: #455a64; font-size: 0.9rem; width: 35%; background: #f5f5f5; }
         .val-a { color: #1976d2; font-weight: bold; }
         .val-b { color: #f57c00; font-weight: bold; }
         
-        .status-box { padding: 12px; text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 0; }
+        .status-box { padding: 12px; text-align: center; font-weight: bold; font-size: 1rem; margin-top: 0; }
         
-        /* 圖示區 */
+        /* 圖示區 (放在右側) */
         .diagram-box { 
+            margin-top: 20px; 
             height: 400px; 
             position: relative; 
             border: 2px solid #ddd; 
@@ -198,8 +174,12 @@
             padding-left: 0; 
         }
         
-        /* 視覺元素樣式 (同前版) */
-        .beam-col { position: absolute; right: 0; top: 30px; width: 50%; display: flex; flex-direction: column; border-left: 3px solid #333; border-bottom: 3px solid #333; border-top: 2px solid #999; background: #eceff1; box-sizing: border-box; }
+        /* 繪圖元件樣式 */
+        .beam-col { 
+            position: absolute; right: 0; top: 30px; width: 50%; display: flex; flex-direction: column; 
+            border-left: 3px solid #333; border-bottom: 3px solid #333; border-top: 2px solid #999;
+            background: #eceff1; box-sizing: border-box; 
+        }
         .zone { display: flex; align-items: center; justify-content: center; font-size: 11px; width: 100%; position: relative; }
         .zone-slab { background: #cfd8dc; color: #455a64; font-weight: bold; border-bottom: 2px solid #455a64; z-index: 2; box-sizing: border-box;}
         .zone-danger { background: rgba(198, 40, 40, 0.1); box-sizing: border-box;}
@@ -214,20 +194,42 @@
         .slab-visual { position: absolute; left: 130px; right: 50%; background: #90a4ae; border-bottom: 1px solid #78909c; z-index: 2; color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center;}
         .ref-line-bs { position: absolute; left: 130px; width: 100%; border-bottom: 2px dotted #d84315; z-index: 5; }
         
-        .dim-line-vertical { position: absolute; width: 1px; background: #555; display: flex; align-items: center; justify-content: center; }
+        .dim-line-vertical { position: absolute; width: 1px; background: #555; display: flex; align-items: center; justify-content: center;}
         .dim-line-vertical::before { content: ''; position: absolute; width: 8px; height: 1px; background: #555; left: -3.5px; top: 0; }
         .dim-line-vertical::after { content: ''; position: absolute; width: 8px; height: 1px; background: #555; left: -3.5px; bottom: 0; }
-        .break-symbol { position: absolute; bottom: 0; left: 130px; width: 100%; height: 10px; background: repeating-linear-gradient(45deg, #fff, #fff 2px, #ccc 2px, #ccc 4px); opacity: 0.5; }
-        .dim-text-label { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.95); padding: 1px 4px; font-size: 11px; font-weight: bold; color: #333; border: 1px solid #ccc; border-radius: 3px; white-space: nowrap; z-index: 20; }
+        .break-symbol { position: absolute; bottom: 0; left: 130px; width: 100%; height: 10px; background: repeating-linear-gradient(45deg, #fff, #fff 2px, #ccc 2px, #ccc 4px); opacity: 0.5;}
+        .dim-text-label { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.95); padding: 1px 4px; font-size: 11px; font-weight: bold; color: #333; border: 1px solid #ccc; border-radius: 3px; white-space: nowrap; z-index: 20;}
         .fl-top-label { position: absolute; top: 5px; left: 132px; font-size: 12px; color: #333; font-weight: bold; z-index: 20; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #ddd; }
 
-        /* Footer */
-        .footer { text-align: center; margin-top: 20px; color: #90a4ae; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .footer { text-align: center; margin-top: 20px; color: #90a4ae; font-size: 0.85rem; padding-bottom: 5px; letter-spacing: 0.5px; width: 100%; grid-column: span 2;}
 
+        /* --- 💻 電腦版 RWD 關鍵魔法 --- */
+        @media (min-width: 900px) {
+            .container {
+                max-width: 1100px; /* 變寬 */
+            }
+            
+            .layout-wrapper {
+                display: grid;
+                grid-template-columns: 400px 1fr; /* 左邊固定400px，右邊自動填滿 */
+                gap: 30px;
+                align-items: start; /* 頂部對齊 */
+            }
+
+            /* 強制右側顯示區在計算前佔位，避免跑版 */
+            .right-panel-wrapper {
+                min-height: 100px;
+            }
+
+            .result-panel { margin-top: 0; } /* 移除電腦版多餘的上方間距 */
+            .diagram-box { height: 500px; } /* 電腦版圖可以再高一點 */
+        }
+
+        /* --- 📱 手機版微調 --- */
         @media (max-width: 480px) {
-            .container { padding: 15px; }
             .input-grid { grid-template-columns: 1fr; gap: 8px; }
-            .group-header { margin-top: 15px; }
+            .compare-table td, .compare-table th { padding: 6px; font-size: 0.9rem; }
+            .row-label { width: 32%; }
             .sleeve-a { left: 40% !important; }
             .sleeve-b { left: 60% !important; }
         }
@@ -238,12 +240,12 @@
 <div class="container">
     <h2>🏗️ 少翔機電 - 穿樑高層計算機</h2>
     
-    <div class="main-layout">
+    <div class="layout-wrapper">
         
-        <div class="control-section">
+        <div class="left-panel-wrapper">
             <div class="mode-switch">
-                <div class="mode-opt active" id="modeSingle" onclick="changeMode('single')">🔘 單管模式</div>
-                <div class="mode-opt" id="modeDual" onclick="changeMode('dual')">⚪ 雙管碰撞</div>
+                <div class="mode-opt active" id="modeSingle" onclick="changeMode('single')">🔘 單管模式 (Single)</div>
+                <div class="mode-opt" id="modeDual" onclick="changeMode('dual')">⚪ 雙管比較 (Dual)</div>
             </div>
 
             <div class="input-grid">
@@ -259,63 +261,65 @@
                             <option value="drop" selected>⬇ 降板 (Drop)</option>
                             <option value="rise">⬆ 升板 (Rise)</option>
                         </select>
-                        <input type="number" id="slabDrop" placeholder="0" value="0" inputmode="numeric">
+                        <input type="number" id="slabDrop" placeholder="輸入高度 (cm)" value="0" inputmode="numeric">
                     </div>
                 </div>
 
-                <div class="group-header" id="headerA"><span class="badge-a">管 A</span> 藍色</div>
+                <div class="group-header" id="headerA"><span class="badge-a">管 A</span> 藍色 (Blue)</div>
                 <div id="inputA1">
-                    <label>套管 (外徑)</label>
+                    <label>套管尺寸 (外徑)</label>
                     <select id="sleeveA">
                         <option value="6">2" (6cm)</option>
-                        <option value="10">3" (10cm)</option>
+                        <option value="9">3" (9cm)</option>
                         <option value="12">4" (12cm)</option>
-                        <option value="15">5" (15cm)</option>
-                        <option value="18" selected>6" (18cm)</option>
+                        <option value="14">5" (14cm)</option>
+                        <option value="17" selected>6" (17cm)</option>
                         <option value="22">8" (22cm)</option>
                         <option value="28">10" (28cm)</option>
                     </select>
                 </div>
                 <div id="inputA2">
-                    <label>本管 (內徑)</label>
+                    <label>本管尺寸 (內徑)</label>
                     <select id="pipeA">
                         <option value="2">1/2" (2cm)</option>
                         <option value="3">3/4" (3cm)</option>
                         <option value="4">1" (4cm)</option>
                         <option value="5">1-1/2" (5cm)</option>
                         <option value="6">2" (6cm)</option>
-                        <option value="10">3" (10cm)</option>
+                        <option value="8">2-1/2" (8cm)</option>
+                        <option value="9">3" (9cm)</option>
                         <option value="12" selected>4" (12cm)</option>
-                        <option value="15">5" (15cm)</option>
-                        <option value="18">6" (18cm)</option>
+                        <option value="14">5" (14cm)</option>
+                        <option value="17">6" (17cm)</option>
                     </select>
                 </div>
 
-                <div class="group-header hidden" id="headerB"><span class="badge-b">管 B</span> 橘色</div>
+                <div class="group-header hidden" id="headerB"><span class="badge-b">管 B</span> 橘色 (Orange)</div>
                 <div class="hidden" id="inputB1">
-                    <label>套管 (外徑)</label>
+                    <label>套管尺寸 (外徑)</label>
                     <select id="sleeveB">
                         <option value="6" selected>2" (6cm)</option>
-                        <option value="10">3" (10cm)</option>
+                        <option value="9">3" (9cm)</option>
                         <option value="12">4" (12cm)</option>
-                        <option value="15">5" (15cm)</option>
-                        <option value="18">6" (18cm)</option>
+                        <option value="14">5" (14cm)</option>
+                        <option value="17">6" (17cm)</option>
                         <option value="22">8" (22cm)</option>
                         <option value="28">10" (28cm)</option>
                     </select>
                 </div>
                 <div class="hidden" id="inputB2">
-                    <label>本管 (內徑)</label>
+                    <label>本管尺寸 (內徑)</label>
                     <select id="pipeB">
                         <option value="2">1/2" (2cm)</option>
                         <option value="3" selected>3/4" (3cm)</option>
                         <option value="4">1" (4cm)</option>
                         <option value="5">1-1/2" (5cm)</option>
                         <option value="6">2" (6cm)</option>
-                        <option value="10">3" (10cm)</option>
+                        <option value="8">2-1/2" (8cm)</option>
+                        <option value="9">3" (9cm)</option>
                         <option value="12">4" (12cm)</option>
-                        <option value="15">5" (15cm)</option>
-                        <option value="18">6" (18cm)</option>
+                        <option value="14">5" (14cm)</option>
+                        <option value="17">6" (17cm)</option>
                     </select>
                 </div>
             </div>
@@ -327,8 +331,8 @@
                     <div class="adj-col" style="grid-column: span 2;" id="colA">
                         <h4 style="color:#1565c0;">管 A 微調</h4>
                         <div style="display:flex; gap:10px;">
-                            <button class="adj-btn btn-a up" onclick="adjustOffset('A', -1)">⬆ 1cm</button>
-                            <button class="adj-btn btn-a down" onclick="adjustOffset('A', 1)">⬇ 1cm</button>
+                            <button class="adj-btn btn-a up" onclick="adjustOffset('A', -1)">⬆ 上移 1cm</button>
+                            <button class="adj-btn btn-a down" onclick="adjustOffset('A', 1)">⬇ 下移 1cm</button>
                         </div>
                         <div class="offset-txt" id="offsetA">貼齊上限</div>
                     </div>
@@ -336,8 +340,8 @@
                     <div class="adj-col hidden" id="colB">
                         <h4 style="color:#e65100;">管 B 微調</h4>
                         <div style="display:flex; gap:10px;">
-                            <button class="adj-btn btn-b up" onclick="adjustOffset('B', -1)">⬆ 1cm</button>
-                            <button class="adj-btn btn-b down" onclick="adjustOffset('B', 1)">⬇ 1cm</button>
+                            <button class="adj-btn btn-b up" onclick="adjustOffset('B', -1)">⬆ 上移 1cm</button>
+                            <button class="adj-btn btn-b down" onclick="adjustOffset('B', 1)">⬇ 下移 1cm</button>
                         </div>
                         <div class="offset-txt" id="offsetB">貼齊上限</div>
                     </div>
@@ -345,7 +349,7 @@
             </div>
         </div>
 
-        <div class="display-section">
+        <div class="right-panel-wrapper">
             <div class="result-panel" id="resultPanel">
                 <div class="status-box" id="statusBox"></div>
 
@@ -425,11 +429,11 @@
                 <div class="break-symbol"></div>
                 <div style="position: absolute; bottom: 15px; left: 15px; font-size: 11px; color: #666;">⏊ 往地面 (FL)</div>
             </div>
-            
-            <div class="footer">
-                Presented by <strong>Stark</strong>
-            </div>
         </div>
+    </div>
+
+    <div class="footer">
+        Presented by <strong>Stark</strong>
     </div>
 </div>
 
@@ -464,6 +468,7 @@
             else el.classList.remove('hidden');
         });
 
+        // 切換模式時清空，但不隱藏容器本身，保持佈局
         document.getElementById('resultPanel').style.display = 'none';
         document.getElementById('diagram').style.display = 'none';
         document.getElementById('adjustPanel').style.display = 'none';
@@ -506,7 +511,7 @@
                 alert("請輸入結構與管 A 數值"); return;
             }
 
-            var oneThird = Math.floor(D / 3);
+            var oneThird = Math.ceil(D / 3); // 無條件進位
             var safeTopFL = H - oneThird;
             var safeBotFL = H - (oneThird * 2);
             var slabBotFL = H - T - offsetVal;
@@ -571,18 +576,23 @@
                      statusMsg += " | ❌ 套管 B 過大";
                 }
 
-                if (sBotA < sTopB && sTopA > sBotB) {
-                    isCollide = true;
-                    statusMsg = "❌ 兩管嚴重碰撞！";
-                    statusColor = "#c62828";
-                    statusBg = "#ffebee";
+                // 垂直淨距
+                var verticalOverlap = false;
+                var clearance = 0;
+                if (pBotA < pTopB && pTopA > pBotB) {
+                    verticalOverlap = true;
                 } else {
-                    var dist = (sBotA >= sTopB) ? (sBotA - sTopB) : (sBotB - sTopA);
-                    if (dist < 5) {
-                        statusMsg = "⚠️ 間距過近 (" + dist.toFixed(1) + "cm)";
-                        statusColor = "#ef6c00";
-                        statusBg = "#fff3e0";
-                    }
+                    clearance = (pBotA >= pTopB) ? (pBotA - pTopB) : (pBotB - pTopA);
+                }
+
+                if (verticalOverlap) {
+                    statusMsg = "⚠️ 本管高程重疊 (若十字交叉會撞)";
+                    statusColor = "#ef6c00";
+                    statusBg = "#fff3e0";
+                } else {
+                    statusMsg = "✅ 本管垂直淨距: " + clearance.toFixed(1) + " cm";
+                    statusColor = "#2e7d32";
+                    statusBg = "#e8f5e9";
                 }
             }
 
@@ -634,7 +644,7 @@
             document.getElementById('resultPanel').style.display = 'block';
             document.getElementById('diagram').style.display = 'block';
 
-            drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsCenA, bsCenB, isCollide);
+            drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsCenA, bsCenB, isCollide, oneThird);
             
         } catch(e) {
             console.error(e);
@@ -642,7 +652,7 @@
         }
     }
 
-    function drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsA, bsB, isCollide) {
+    function drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsA, bsB, isCollide, oneThirdVal) {
         var wrapper = document.getElementById('beamVisual');
         wrapper.innerHTML = '';
         var leftStruct = document.getElementById('leftStructure');
@@ -658,7 +668,7 @@
         var beamPx = D * scale;
         var slabPx = T * scale;
         var offsetPx = offsetVal * scale; 
-        var oneThirdPx = (D/3) * scale;
+        var oneThirdPx = oneThirdVal * scale; 
         var topOffset = 30; 
         
         wrapper.style.height = beamPx + 'px';
@@ -671,13 +681,14 @@
         slabDiv.innerText = "板";
         wrapper.appendChild(slabDiv);
 
-        var topDangerH = (D/3) - T;
+        var topDangerH = oneThirdVal - T; 
         if (topDangerH > 0) {
             var dangerTop = document.createElement('div');
             dangerTop.className = 'zone zone-danger';
             dangerTop.style.height = (topDangerH * scale) + 'px';
             wrapper.appendChild(dangerTop);
-        }
+        } 
+
         var safeDiv = document.createElement('div');
         safeDiv.className = 'zone zone-safe';
         safeDiv.style.height = oneThirdPx + 'px';
@@ -688,7 +699,7 @@
         dangerBot.style.height = oneThirdPx + 'px';
         wrapper.appendChild(dangerBot);
 
-        // 左側結構 (Left: 130px)
+        // 左側結構
         if (offsetVal > 0) {
             var topping = document.createElement('div');
             topping.className = 'topping-visual';
@@ -724,17 +735,14 @@
         var bsLineTop = topOffset + offsetPx + slabPx;
         document.getElementById('slabLine').style.top = bsLineTop + 'px';
 
-        // 標示線調整
-        // 1. 層高 (最左 15px)
+        // 調整標示線
         document.getElementById('storyHeightDim').style.top = topOffset + 'px';
         document.getElementById('storyHeightDim').style.height = (boxHeight - topOffset) + 'px'; 
         
-        // 2. 樓高 (左二 75px)
         var roomLineTop = Math.max(0, bsLineTop);
         document.getElementById('roomHeightDim').style.top = roomLineTop + 'px';
         document.getElementById('roomHeightDim').style.height = (boxHeight - roomLineTop) + 'px';
 
-        // 3. 淨高 (樑底)
         document.getElementById('clearHeightDim').style.top = (topOffset + beamPx) + 'px';
         document.getElementById('clearHeightDim').style.height = (boxHeight - topOffset - beamPx) + 'px';
 
@@ -784,8 +792,7 @@
             document.getElementById('diagram').appendChild(divSB);
 
             if (isCollide) {
-                divSA.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
-                divSB.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
+                // 移除碰撞紅底
             }
             if (centerBPx > bsLineTop) {
                 var lineB = createBsLine(bsLineTop, centerBPx, bsB, '85%', true);
