@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>少翔機電 - 穿樑高層計算機 V17.4</title>
+    <title>少翔機電 - 穿樑高層計算機 V22.1</title>
     <style>
         /* --- 全局設定 --- */
         body { 
@@ -87,6 +87,7 @@
         }
         input:focus, select:focus { border-color: #00897b; outline: none; }
         .drop-input { border-color: #ffb74d; background: #fff8e1; }
+        .beam-drop-input { border-color: #90a4ae; background: #eceff1; }
 
         .slab-adj-group { display: flex; gap: 5px; }
         .slab-adj-group select { width: 45%; background: #fff8e1; border-color: #ffb74d; }
@@ -94,15 +95,27 @@
 
         .hidden { display: none !important; }
 
+        /* 計算按鈕 - 強制樣式 */
         .main-btn { 
-            width: 100%; padding: 15px; background-color: #00897b; color: white; border: none; 
-            border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: block !important; /* 強制顯示 */
+            width: 100%; 
+            padding: 15px; 
+            background-color: #00897b; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
             transition: transform 0.1s;
+            clear: both; /* 清除浮動 */
         }
-        .main-btn:active { transform: scale(0.98); }
+        .main-btn:active { transform: scale(0.98); background-color: #00796b; }
 
-        .adjust-panel { display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #ffe0b2; }
+        .adjust-panel { display: none; background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #ffe0b2; }
         .adjust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .adj-col { text-align: center; }
         .adj-col h4 { margin: 0 0 8px 0; font-size: 1rem; color: #444; }
@@ -117,7 +130,7 @@
         .btn-b.up { background: #ffe0b2; color: #e65100; }
         .btn-b.down { background: #ffcc80; color: #e65100; }
 
-        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; margin-top: 5px; min-height: 1.2em;}
+        .offset-txt { font-size: 0.85rem; color: #666; font-weight: bold; margin-top: 5px;}
 
         .result-panel { 
             background: #e0f2f1; border-radius: 10px; margin-top: 20px; display: none; overflow: hidden; border: 1px solid #b2dfdb; 
@@ -140,9 +153,10 @@
         }
         
         .beam-col { 
-            position: absolute; right: 0; top: 30px; width: 50%; display: flex; flex-direction: column; 
+            position: absolute; right: 0; top: 60px; width: 50%; display: flex; flex-direction: column; 
             border-left: 3px solid #333; border-bottom: 3px solid #333; border-top: 2px solid #999;
-            background: #eceff1; box-sizing: border-box; 
+            background: #eceff1; box-sizing: border-box;
+            transition: top 0.3s ease; 
         }
         
         .abs-zone { position: absolute; left: 0; width: 100%; box-sizing: border-box; }
@@ -169,9 +183,7 @@
         .sleeve-b { position: absolute; background: rgba(255, 152, 0, 0.15); border: 2px dashed #f57c00; border-radius: 50%; z-index: 11; left: 65%; transform: translate(-50%, -50%); transition: top 0.2s ease; }
         .pipe-b { position: absolute; background: rgba(255, 152, 0, 0.8); border: 1px solid #e65100; border-radius: 50%; z-index: 16; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 
-        .center-dot {
-            position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 20;
-        }
+        .center-dot { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 20; }
 
         .topping-visual { position: absolute; left: 130px; right: 50%; background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 5px, #e0e0e0 5px, #e0e0e0 10px); z-index: 1; border-bottom: 1px dashed #999; text-align: center; font-size: 10px; color: #666; display: flex; align-items: center; justify-content: center;}
         .slab-visual { position: absolute; left: 130px; right: 50%; background: #90a4ae; border-bottom: 1px solid #78909c; z-index: 2; color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center;}
@@ -183,6 +195,7 @@
         .break-symbol { position: absolute; bottom: 0; left: 130px; width: 100%; height: 10px; background: repeating-linear-gradient(45deg, #fff, #fff 2px, #ccc 2px, #ccc 4px); opacity: 0.5;}
         .dim-text-label { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.95); padding: 1px 4px; font-size: 11px; font-weight: bold; color: #333; border: 1px solid #ccc; border-radius: 3px; white-space: nowrap; z-index: 20;}
         .fl-top-label { position: absolute; top: 5px; left: 132px; font-size: 12px; color: #333; font-weight: bold; z-index: 20; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #ddd; }
+        .fl-beam-label { position: absolute; top: -22px; right: 0; font-size: 11px; color: #555; font-weight: bold; width:100%; text-align:center;}
 
         .bs-target-dot { position: absolute; width: 6px; height: 6px; background: #d84315; border-radius: 50%; left: -2px; bottom: -3px; z-index: 30; }
 
@@ -194,7 +207,7 @@
             .layout-wrapper { display: grid; grid-template-columns: 400px 1fr; gap: 30px; align-items: start; }
             .right-panel-wrapper { min-height: 100px; }
             .result-panel { margin-top: 0; } 
-            .diagram-box { height: 500px; } 
+            .diagram-box { height: 550px; } 
         }
 
         /* --- 📱 手機版 RWD --- */
@@ -235,6 +248,11 @@
                         </select>
                         <input type="number" id="slabDrop" placeholder="輸入高度 (cm)" value="0" inputmode="numeric">
                     </div>
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <label style="color:#455a64;">5. 樑降 (Beam Drop) - <small>樑整體下降</small></label>
+                    <input type="number" id="beamDrop" class="beam-drop-input" placeholder="0 (無樑降)" value="0" inputmode="numeric">
                 </div>
 
                 <div class="group-header" id="headerA"><span class="badge-a">管 A</span> 藍色 (Blue)</div>
@@ -387,11 +405,9 @@
                 <div id="storyHeightDim" class="dim-line-vertical" style="left: 15px;">
                     <div class="dim-text-label" style="left: 5px;">層高 <span id="lblStoryH"></span></div>
                 </div>
-
                 <div id="roomHeightDim" class="dim-line-vertical" style="left: 75px;">
                     <div class="dim-text-label" style="left: 5px;">樓高 <span id="lblRoomH"></span></div>
                 </div>
-
                 <div id="clearHeightDim" class="dim-line-vertical" style="left: 85%;">
                     <div class="dim-text-label" style="left: 5px;">淨高 <span id="lblClearH"></span></div>
                 </div>
@@ -454,7 +470,7 @@
     }
 
     function adjustOffset(pipe, delta) {
-        // 新增：預判邏輯 - 若下移會超出安全下限，則不執行
+        // 預判邏輯 - 確保包含 Beam Drop
         var H = Number(document.getElementById('floorHeight').value);
         var D = Number(document.getElementById('beamDepth').value);
         var T = Number(document.getElementById('slabThick').value);
@@ -462,16 +478,18 @@
         var dropType = document.getElementById('dropType').value;
         if(dropVal < 0) dropVal = 0;
         var offsetVal = (dropType === 'drop') ? dropVal : -dropVal;
+        var beamDropVal = Number(document.getElementById('beamDrop').value);
+        if(beamDropVal < 0) beamDropVal = 0;
         
         var SA = Number(document.getElementById('sleeveA').value);
         var SB = Number(document.getElementById('sleeveB').value);
         
-        // 計算安全下限
+        // 樑頂 = H - BeamDrop
+        var beamTopFL = H - beamDropVal;
         var oneThird = Math.ceil(D / 3);
-        var safeBotFL = H - (oneThird * 2); // 安全區底部高程
+        var safeBotFL = beamTopFL - (oneThird * 2); 
+        var safeTopFL = beamTopFL - oneThird;
         
-        // 計算物理上限
-        var safeTopFL = H - oneThird;
         var slabBotFL = H - T - offsetVal;
         var limitTop = Math.min(safeTopFL, slabBotFL);
         
@@ -486,19 +504,14 @@
         
         var newOffset = currentOffset + delta;
         
-        // 檢查上界
         if (newOffset < 0) newOffset = 0;
         
-        // 檢查下界：如果這次移動會導致 套管底 < 安全區底，且是按下移 (delta > 0)，則禁止
-        // Pipe Bottom FL = (limitTop - newOffset) - sleeveDia
         var nextBotFL = (limitTop - newOffset) - sleeveDia;
         
         if (nextBotFL < safeBotFL && delta > 0) {
-            // 阻擋操作，不更新 offset
-            return;
+            return; // 阻擋
         }
         
-        // 通過檢查，更新變數
         if (pipe === 'A') g_offsetA = newOffset;
         else g_offsetB = newOffset;
         
@@ -510,11 +523,15 @@
             var H = Number(document.getElementById('floorHeight').value);
             var D = Number(document.getElementById('beamDepth').value);
             var T = Number(document.getElementById('slabThick').value);
+            
             var dropVal = Number(document.getElementById('slabDrop').value);
             var dropType = document.getElementById('dropType').value; 
-            
             if(dropVal < 0) dropVal = 0;
             var offsetVal = (dropType === 'drop') ? dropVal : -dropVal;
+
+            var beamDropEl = document.getElementById('beamDrop');
+            var beamDropVal = beamDropEl ? Number(beamDropEl.value) : 0;
+            if(beamDropVal < 0) beamDropVal = 0;
 
             var SA = Number(document.getElementById('sleeveA').value);
             var PA = Number(document.getElementById('pipeA').value);
@@ -523,12 +540,19 @@
                 alert("請輸入結構與管 A 數值"); return;
             }
 
-            var oneThird = Math.ceil(D / 3); // 無條件進位
-            var safeTopFL = H - oneThird;
-            var safeBotFL = H - (oneThird * 2);
+            var oneThird = Math.ceil(D / 3);
+            
+            // 樑頂
+            var beamTopFL = H - beamDropVal;
+            
+            var safeTopFL = beamTopFL - oneThird;
+            var safeBotFL = beamTopFL - (oneThird * 2);
+            
             var slabBotFL = H - T - offsetVal;
+            
             var limitTop = Math.min(safeTopFL, slabBotFL);
-            var clearHeight = H - D;
+            
+            var clearHeight = beamTopFL - D;
             var roomHeight = slabBotFL; 
 
             // 計算 A
@@ -609,16 +633,24 @@
                 }
             }
 
-            // UI 更新: 增加是否到達下限的提示
-            var limitReachedA = (sBotA <= safeBotFL); // 其實是 ==，但用 <= 保險
+            if (isUnsafeA || isUnsafeB) {
+                statusMsg = "❌ 結構違規 (超出安全區)";
+                statusColor = "#c62828";
+                statusBg = "#ffebee";
+            }
+
+            // UI 更新
+            var limitReachedA = (sBotA <= safeBotFL);
             var txtA = (g_offsetA===0) ? "貼齊上限" : "降 " + g_offsetA + "cm";
             if (limitReachedA) txtA += " <span style='color:#c62828'>(已達安全下限)</span>";
             document.getElementById('offsetA').innerHTML = txtA;
 
-            var limitReachedB = (sBotB <= safeBotFL);
-            var txtB = (g_offsetB===0) ? "貼齊上限" : "降 " + g_offsetB + "cm";
-            if (currentMode === 'dual' && limitReachedB) txtB += " <span style='color:#c62828'>(已達安全下限)</span>";
-            document.getElementById('offsetB').innerHTML = txtB;
+            if(currentMode === 'dual') {
+                var limitReachedB = (sBotB <= safeBotFL);
+                var txtB = (g_offsetB===0) ? "貼齊上限" : "降 " + g_offsetB + "cm";
+                if (limitReachedB) txtB += " <span style='color:#c62828'>(已達安全下限)</span>";
+                document.getElementById('offsetB').innerHTML = txtB;
+            }
             
             document.getElementById('resBsTopA').innerText = Math.round(bsTopA) + " cm";
             document.getElementById('resBsCenA').innerText = Math.round(bsCenA) + " cm";
@@ -629,7 +661,6 @@
             document.getElementById('resBotA').innerText = Math.round(pBotA);
 
             if (currentMode === 'dual') {
-                
                 document.getElementById('resBsTopB').innerText = Math.round(bsTopB) + " cm";
                 document.getElementById('resBsCenB').innerText = Math.round(bsCenB) + " cm";
                 document.getElementById('resBsBotB').innerText = Math.round(bsBotB) + " cm";
@@ -664,7 +695,7 @@
             document.getElementById('resultPanel').style.display = 'block';
             document.getElementById('diagram').style.display = 'block';
 
-            drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsCenA, bsCenB, isUnsafeA, isUnsafeB, oneThird);
+            drawDiagram(D, T, offsetVal, beamDropVal, SA, PA, SB, PB, bsCenA, bsCenB, isUnsafeA, isUnsafeB, oneThird);
             
         } catch(e) {
             console.error(e);
@@ -672,9 +703,17 @@
         }
     }
 
-    function drawDiagram(D, T, offsetVal, SA, PA, SB, PB, bsA, bsB, isUnsafeA, isUnsafeB, oneThirdVal) {
+    function drawDiagram(D, T, offsetVal, beamDropVal, SA, PA, SB, PB, bsA, bsB, isUnsafeA, isUnsafeB, oneThirdVal) {
         var wrapper = document.getElementById('beamVisual');
         wrapper.innerHTML = '';
+        
+        // 樑頂標籤 (由JS動態生成)
+        var H = Number(document.getElementById('floorHeight').value);
+        var label = document.createElement('div');
+        label.className = 'fl-beam-label';
+        label.innerText = "樑頂 FL+" + (H - beamDropVal);
+        wrapper.appendChild(label);
+
         var leftStruct = document.getElementById('leftStructure');
         leftStruct.innerHTML = '';
         var bsLayer = document.getElementById('bsVisualLayer');
@@ -688,11 +727,14 @@
         var beamPx = D * scale;
         var slabPx = T * scale;
         var offsetPx = offsetVal * scale; 
+        var beamDropPx = beamDropVal * scale;
         var oneThirdPx = oneThirdVal * scale; 
-        var topOffset = 30; 
+        var topOffset = 60; 
+        
+        var beamTopPos = topOffset + beamDropPx;
         
         wrapper.style.height = beamPx + 'px';
-        wrapper.style.top = topOffset + 'px'; 
+        wrapper.style.top = beamTopPos + 'px'; 
         
         // 結構
         var slabDiv = document.createElement('div');
@@ -718,7 +760,6 @@
         divSafe.innerText = "安全區";
         wrapper.appendChild(divSafe);
 
-        // 安全區界線
         var lineTop = document.createElement('div');
         lineTop.className = 'limit-line';
         lineTop.style.top = (oneThirdPx - 2) + 'px';
@@ -737,6 +778,8 @@
         wrapper.appendChild(divDangerBot);
 
         // 左側結構
+        var slabTopPos = topOffset + offsetPx;
+        
         if (offsetVal > 0) {
             var topping = document.createElement('div');
             topping.className = 'topping-visual';
@@ -748,7 +791,7 @@
             var leftSlab = document.createElement('div');
             leftSlab.className = 'slab-visual';
             leftSlab.style.height = slabPx + 'px';
-            leftSlab.style.top = (topOffset + offsetPx) + 'px'; 
+            leftSlab.style.top = slabTopPos + 'px'; 
             leftSlab.innerText = "降板";
             leftStruct.appendChild(leftSlab);
         } 
@@ -756,7 +799,7 @@
             var leftSlab = document.createElement('div');
             leftSlab.className = 'slab-visual';
             leftSlab.style.height = slabPx + 'px';
-            leftSlab.style.top = (topOffset + offsetPx) + 'px'; 
+            leftSlab.style.top = slabTopPos + 'px'; 
             leftSlab.innerText = "升板";
             leftStruct.appendChild(leftSlab);
         }
@@ -769,7 +812,7 @@
             leftStruct.appendChild(leftSlab);
         }
 
-        var bsLineTop = topOffset + offsetPx + slabPx;
+        var bsLineTop = slabTopPos + slabPx;
         document.getElementById('slabLine').style.top = bsLineTop + 'px';
 
         // 調整標示線
@@ -780,8 +823,9 @@
         document.getElementById('roomHeightDim').style.top = roomLineTop + 'px';
         document.getElementById('roomHeightDim').style.height = (boxHeight - roomLineTop) + 'px';
 
-        document.getElementById('clearHeightDim').style.top = (topOffset + beamPx) + 'px';
-        document.getElementById('clearHeightDim').style.height = (boxHeight - topOffset - beamPx) + 'px';
+        var beamBotPos = beamTopPos + beamPx;
+        document.getElementById('clearHeightDim').style.top = beamBotPos + 'px';
+        document.getElementById('clearHeightDim').style.height = (boxHeight - beamBotPos) + 'px';
 
         var oldPipes = document.querySelectorAll('.diagram-box > .sleeve-a, .diagram-box > .sleeve-b');
         oldPipes.forEach(p => p.remove());
@@ -797,7 +841,6 @@
         divSA.style.top = centerAPx + 'px';
         divSA.style.left = (currentMode === 'single') ? '50%' : '35%';
 
-        // 管 A 顏色控制
         if (isUnsafeA) {
             divSA.style.borderColor = '#c62828';
             divSA.style.backgroundColor = 'rgba(198, 40, 40, 0.4)';
@@ -808,18 +851,15 @@
         divPA.style.width = pipeAPx + 'px';
         divPA.style.height = pipeAPx + 'px';
         
-        // 本管A也變紅
         if (isUnsafeA) {
             divPA.style.borderColor = '#b71c1c';
             divPA.style.backgroundColor = 'rgba(211, 47, 47, 0.9)';
         }
 
         divSA.appendChild(divPA);
-        
         var dotA = document.createElement('div');
         dotA.className = 'center-dot';
         divSA.appendChild(dotA);
-
         document.getElementById('diagram').appendChild(divSA);
 
         if (centerAPx > bsLineTop) {
@@ -855,11 +895,9 @@
             }
 
             divSB.appendChild(divPB);
-            
             var dotB = document.createElement('div');
             dotB.className = 'center-dot';
             divSB.appendChild(dotB);
-
             document.getElementById('diagram').appendChild(divSB);
 
             if (centerBPx > bsLineTop) {
